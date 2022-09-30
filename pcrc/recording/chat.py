@@ -98,7 +98,7 @@ class ChatManager:
 	def __run(self):
 		self.logger.info('Chat thread started')
 		while self.__running:
-			if self.__can_chat():
+			if not self.__pcrc.config.get('disable_chat') and self.__can_chat():
 				try:
 					msg: Message = self.__message_queue.get(timeout=0.01)
 				except Empty:

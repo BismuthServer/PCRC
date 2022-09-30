@@ -27,6 +27,8 @@
     "auto_relogin_attempts": 5,
     "chat_spam_protect": true,
     "command_prefix": "!!PCRC",
+    "disable_chat": false,
+    "disable_join_leave_player_chat": false,
 
     "__4__": "-------- PCRC Features --------",
     "daytime": 4000,

@@ -225,7 +225,7 @@ class Recorder:
 			no_player_movement: bool = self.has_no_player_movement(current_time)
 			if no_player_movement:
 				self.afk_time += current_time - self.last_packet_time
-			if self.last_no_player_movement != no_player_movement:
+			if self.last_no_player_movement != no_player_movement and self.pcrc.config.get('disable_join_leave_player_chat'):
 				self.pcrc.chat(self.tr('chat.pause_recording') if no_player_movement else self.tr('chat.continue_recording'))
 			self.last_no_player_movement = no_player_movement
 		self.last_packet_time = current_time
