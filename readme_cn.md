@@ -91,14 +91,6 @@ PCRC 目前支持连接官服原版 Minecraft 服务端，支持以下版本：
 
 `store_token`: 当设为 true 且 `authenticate_type` 为 `microsoft` 时，微软账号登录所获取的令牌将被储存于文件 `token.json` 中。在启动 PCRC 时，该文件中的令牌将被使用，只要它还没过期。注意，令牌将以明文储存
 
-`address`: Minecraft 服务器的 IP 地址
-
-`port`: Minecraft 服务器的端口
-
-`server_name`: replay 回放中心内显示的服务器名称
-
-`initial_version`: 首选的用于连接至类似 Bungeecord 的 Minecraft 版本
-
 帐户相关配置条目的例子：
 
 ```json5
@@ -127,6 +119,14 @@ PCRC 目前支持连接官服原版 Minecraft 服务端，支持以下版本：
     "password": "",  // 该条目的值不会被使用，将被忽略
 }
 ```
+
+`address`: Minecraft 服务器的 IP 地址
+
+`port`: Minecraft 服务器的端口
+
+`server_name`: replay 回放中心内显示的服务器名称
+
+`initial_version`: 首选的用于连接至类似 Bungeecord 的 Minecraft 版本
 
 ### PCRC 设置
 
@@ -164,6 +164,18 @@ PCRC 目前支持连接官服原版 Minecraft 服务端，支持以下版本：
 
 `remove_phantoms`: 是否不录制幻翼
 
+`on_joined_commands`: 一个字符串列表，储存着 PCRC 机器人加入游戏后将依次输入的指令。如果你的服务器有登录插件等，你可能需要这个
+
+```json5
+// on_joined_commands 例子
+{
+    "on_joined_commands": [
+        "/login myPassword",
+        "/server myServer"
+    ],
+}
+```
+
 ## 指令
 
 指令前缀 `!!PCRC` 可在配置文件中自定义
@@ -181,6 +193,8 @@ PCRC 目前支持连接官服原版 Minecraft 服务端，支持以下版本：
 `restart`: 重启 PCRC
 
 `exit`: 退出程序
+
+`reload`: 重新加载配置文件。注意并非所有的配置文件项均支持热重载，如 `authenticate_type` 是不支持热重载的
 
 `auth`: 再次尝试 Minecraft 登录验证。在登录失败时使用
 
@@ -206,7 +220,7 @@ PCRC 目前支持连接官服原版 Minecraft 服务端，支持以下版本：
 
 `!!PCRC stop`: 停止 PCRC 并关闭录制。仅对控制台输入有效
 
-`!!PCRC reload`: 重载与 MCDR 相关的配置文件
+`!!PCRC reload`: 重载 PCRC 的配置文件和与 MCDR 相关的配置文件。注意并非所有的 PCRC 配置文件项均支持热重载
 
 `!!PCRC set_redirect_url <url>`: 输入用于微软账号登录时的页面链接
 

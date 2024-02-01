@@ -55,13 +55,29 @@ class PcrcClient:
 	def tr(self, key: str, *args, **kwargs) -> str:
 		return self.translation.translate(key, self.config.get('language')).format(*args, **kwargs)
 
-	def set_config(self, option, value, forced=False):
+	def set_config_entry(self, option, value, forced=False):
 		if not forced and option not in SettableOptions:
-			self.chat(self.tr('chat.illegal_toption_name', option, self.config.get('command_prefix')))
+			self.chat(self.tr('chat.illegal_option_name', option, self.config.get('command_prefix')))
 			return
 		self.chat(self.tr('chat.option_set', option, value))
 		self.config.set_value(option, value)
 		self.logger.info('Option <{}> set to <{}>'.format(option, value))
+
+	def reload_config(self) -> bool:
+		self.logger.info('Reloading config')
+		try:
+			self.config.reload()
+		except:
+			self.logger.exception('Fail to reload config')
+			return False
+		else:
+			self.__on_config_reload()
+			return True
+
+	def __on_config_reload(self):
+		# authenticate_type doesn't support hot-reload
+		self.retry_counter.set_max_retries(self.config.get('auto_relogin_attempts'))
+		self.logger.set_debug(self.config.get('debug_mode'))
 
 	# ===================
 	#    State Getters
@@ -74,7 +90,7 @@ class PcrcClient:
 		return self.__connection_state == ConnectionState.disconnected
 
 	def has_started_disconnecting(self) -> bool:
-		return self.__connection_state == ConnectionState.disconnecting or self.is_disconnected()
+		return self.__connection_state in (ConnectionState.disconnecting, ConnectionState.disconnected)
 
 	def is_stopping(self) -> bool:
 		return self.__flag_stopping
@@ -191,6 +207,7 @@ class PcrcClient:
 		"""
 		if self.__flag_stopping:
 			self.logger.warning('PCRC is already stopping')
+			traceback.print_stack()
 			return False
 		self.logger.info('Stopping PCRC, auto restart = {}, by_user = {}'.format(auto_restart, by_user))
 		self.chat(self.tr('chat.stopping'))
@@ -234,10 +251,9 @@ class PcrcClient:
 	def on_connection_exception(self, exception: Exception, exc_info):
 		log = self.logger.debug if self.has_started_disconnecting() else self.logger.exception
 		log('Exception in network thread: {} ({})'.format(exception, getattr(type(exception), '__name__')))
-		if log == self.logger.debug:
-			self.logger.debug(traceback.format_exc())
 		self.__connection_state = ConnectionState.disconnected
-		self.__stop_by_external_force()
+		if not self.has_started_disconnecting():
+			self.__stop_by_external_force()
 
 	# called when there's only 1 protocol version in allowed_proto_versions in pycraft connection
 	def on_protocol_version_decided(self, protocol_version):
@@ -311,6 +327,10 @@ class PcrcClient:
 		self.logger.info('PCRC bot joined the server')
 		self.__connection_state = ConnectionState.connected
 		self.retry_counter.reset_counter()
+		commands = self.config.get('on_joined_commands')
+		if commands is not None and len(commands) > 0:
+			for cmd in commands:
+				self.chat(cmd)
 		self.chat(self.tr('chat.game_join'))
 
 	def on_disconnect_packet(self, packet):

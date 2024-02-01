@@ -91,14 +91,6 @@ When used as a plugin for MCDR, the path to the configuration file will be `conf
 
 `store_token`: When set to true and the `authenticate_type` is `microsoft`, the microsoft login token will be saved to file `token.json`. When launching PCRC the stored token will be loaded and used if it's not expired. Noted: The login token will be stored in plaintext
 
-`address`: IP Address of the Minecraft server
-
-`port`: Port of the Minecraft server
-
-`server_name`: The server name showed in replay viewer
-
-`initial_version`: The preferred Minecraft version that used to connect to bungeecord like server
-
 Examples for those account related config entries:
 
 ```json5
@@ -127,6 +119,14 @@ Examples for those account related config entries:
     "password": "",  // This entry will not be used and will be ignored
 }
 ```
+
+`address`: IP Address of the Minecraft server
+
+`port`: Port of the Minecraft server
+
+`server_name`: The server name showed in replay viewer
+
+`initial_version`: The preferred Minecraft version that used to connect to bungeecord like server
 
 ### PCRC Control
 
@@ -164,6 +164,18 @@ Examples for those account related config entries:
 
 `remove_phantoms`: If set to true, phantoms won't be recorded
 
+`on_joined_commands`: A string list storing the commands that the PCRC bot will enter in sequence after it joins the game. You might need this if the server has some kind of login plugin etc.
+
+```json5
+// on_joined_commands example
+{
+    "on_joined_commands": [
+        "/login myPassword",
+        "/server myServer"
+    ],
+}
+```
+
 ### PCRC Whitelist
 
 `enabled`: Whether to enable whitelist
@@ -187,6 +199,8 @@ Available if launched directly
 `restart`: Restart PCRC
 
 `exit`: Exit the program
+
+`reload`: Reload the config file. Notes that not all config entries support hot-reload, e.g. `authenticate_type` is not hot-reload-able
 
 `auth`: Authenticate with minecraft again. Used when the previous authentication failed
 
@@ -212,7 +226,7 @@ Available if used as a MCDR plugin
 
 `!!PCRC stop`: stop PCRC and stop recording. Only works with console command input
 
-`!!PCRC reload`: Reload the config file for MCDR
+`!!PCRC reload`: Reload the config for PCRC and the config file for MCDR. Notes that not all PCRC config entries support hot-reload
 
 `!!PCRC set_redirect_url <url>`: Input the url used in microsoft logging in
 
